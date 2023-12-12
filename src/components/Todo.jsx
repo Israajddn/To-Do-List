@@ -2,14 +2,25 @@ import React from 'react';
 import { ACTIONS } from '../App';
 
 export default function Todo({todo, dispatch}) {
+  
   return (
     <div className='Todo'>
-        <span style={{color: todo.complete? '#AAA' : '#000'}}>
-            {todo.name}
+      
+       {/* <input type='checkbox' checked = {todo.completed === false ? "" : "checked"}></input> */}
+
+       <input type='checkbox' checked = {todo.completed} onChange={() => dispatch({type: ACTIONS.TOGGLE_TODO, payload:{id: todo.id}})}></input>
+
+        <span style={todo.completed ? {}:{}}>
+            {todo.title}
         </span>
-        <button onClick={() => dispatch({type: ACTIONS.TOGGLE_TODO, payload:{id: todo.id}})}>Toggle</button>
+
+        <button onClick={() => dispatch({type: ACTIONS.TOGGLE_TODO, payload:{id: todo.id}})}>Edit</button>
+
+        <button onClick={() => dispatch({type: ACTIONS.DELETE_TODO, payload:{id: todo.id}})} disabled = {todo.completed === false ? "disabled" : ""}>Delete</button>
+       
         
-        <button onClick={() => dispatch({type: ACTIONS.DELETE_TODO, payload:{id: todo.id}})}>Delete</button>
     </div>
   )
 }
+
+
