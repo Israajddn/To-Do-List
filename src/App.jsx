@@ -6,6 +6,7 @@ export const ACTIONS = {
   ADD_TODO: 'add-todo',
   TOGGLE_TODO: 'toggle-todo',
   DELETE_TODO: 'delete-todo',
+  EDIT_TODO: 'edit-todo'
 }
 
 function reducer(todos, action) {
@@ -19,6 +20,11 @@ function reducer(todos, action) {
         }
         return todo;
       })
+    case ACTIONS.EDIT_TODO:
+    // todos.filter(todo => todo.id !== action.payload.id);
+    // const todo = todos.find(todo => todo.id === action.payload.id);
+    // console.log(todo);
+    // return {...todo, title: };
     case ACTIONS.DELETE_TODO:
       return todos.filter(todo => todo.id !== action.payload.id);
     default:
@@ -27,7 +33,7 @@ function reducer(todos, action) {
 }
 
 function newTodo(name) {
-  return { id: Date.now(), name: name, complete: false }
+  return { id: Date.now(), name: name, completed: false }
 }
 
 function App() {
@@ -167,20 +173,65 @@ function App() {
     setName('');
   }
 
-  console.log(todos);
+  // console.log(todos);
+
+  const [isEditing, setIsEditing] = useState(false);
+
+  const [currentTodo, setCurrentTodo] = useState({});
+
+  function handleEditInputChange(e) {
+    setCurrentTodo({ ...currentTodo, text: e.target.value });
+    console.log(currentTodo);
+  }
+  function handleEditClick(todo) {
+    setIsEditing(true);
+    setCurrentTodo({ ...todo });
+  }
+  function handleUpdateTodo(id, updatedTodo) {
+    const updatedItem = todos.map((todo) => {
+      return todo.id === id ? updatedTodo : todo;
+    });
+    setIsEditing(false);
+    setTodos(updatedItem);
+  }
+  function handleEditFormSubmit(e) {
+    e.preventDefault();
+
+    // call the handleUpdateTodo function - passing the currentTodo.id and the currentTodo object as arguments
+    handleUpdateTodo(currentTodo.id, currentTodo);
+  }
+
 
   return (
     <div className='App'>
-      <h1>Create Todo List</h1>
-      <form>
 
-        {/* create an input to write a new to do */}
-        <input type="text" value={name} onChange={e => setName(e.target.value)} /> <button onClick={handleAdd}>Add</button>
-      </form>
+      {isEditing ? (
+        <form onSubmit={handleEditFormSubmit}>
+          <h2>Edit Todo</h2>
+          <label>Edit todo: </label>
+          <input
+            type="text"
+            value={currentTodo.text}
+            onChange={handleEditInputChange}
+          />
+          <button type="submit">Save</button>
+        </form>
+      ) : (
+        <form>
+          <h1>Create Todo List</h1>
+          <input type="text" value={name} onChange={e => setName(e.target.value)} /> <button onClick={handleAdd}>Add</button>
+        </form>
+      )}
+
       
-      {todos.map(todo => {
+        {todos.map((todo) => (
+          <div key={todo.id}>
+            <Todo key={todo.id} todo={todo} dispatch={dispatch} /> <button onClick={() => handleEditClick(todo)}>Edit</button>
+          </div>
+        ))}
+      {/* {todos.map(todo => {
         return <Todo key={todo.id} todo={todo} dispatch={dispatch} />
-      })}
+      })} */}
     </div>
   )
 }
